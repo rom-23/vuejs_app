@@ -1,0 +1,79 @@
+'use strict';
+var Booster = require('../model/boosterModel.js');
+const { checkAndChange } = require('../functions');
+
+exports.AllBooster = function(req, res) {
+  Booster.getAllBooster(function(err, booster) {
+    if (err) res.send(err);
+    res.send(checkAndChange(booster));
+  });
+};
+exports.DeleteBooster = function(req, res) {
+  Booster.DeleteBoosterById(req.params.idbooster, function(err, booster) {
+    if (req.params.idbooster === '0' || !booster) {
+      res.json({ error: ' Id Not valid for removal' });
+      console.log('Id Not valid for removal');
+    } else {
+      res.json(checkAndChange(booster));
+      console.log('--- > Id deleted done :' + req.params.idbooster);
+    }
+  });
+};
+exports.UpdateBooster = function(req, res) {
+  let update_boost = new Booster(
+    req.body.booster_name,
+    req.body.booster_dose,
+    req.body.boosterdesc,
+    req.body.booster_date.substring(0, 10)
+  );
+  Booster.UpdateBoosterById(req.params.idbooster, update_boost, function(
+    err,
+    booster
+  ) {
+    if (err || !booster) {
+      res.json({ error: 'Name already taken' + err });
+      console.log('-- > error with update : ' + req.params.idbooster);
+    } else {
+      res.json(checkAndChange(booster));
+      console.log('-- > Update done for id : ' + req.params.idbooster);
+    }
+  });
+};
+exports.BoosterById = function(req, res) {
+  Booster.getBoosterById(req.params.idbooster, function(err, booster) {
+    if (req.params.idbooster === '0' || booster[0] === undefined) {
+      res.json({ error: 'Error with a wrong id ' });
+      console.log('error with the id');
+    } else {
+      res.json(checkAndChange(booster));
+      console.log('-- > Booster search done');
+    }
+  });
+};
+exports.BoosterByIdCulture = function(req, res) {
+  Booster.getBoosterByIdCulture(req.params.idculture, function(err, booster) {
+    if (req.params.idculture === '0' || booster[0] === undefined) {
+      res.json({ error: 'Error with a wrong idculture ' });
+      console.log('error with the idculture');
+    } else {
+      res.json(checkAndChange(booster));
+      console.log('-- > Boosters by culture search done');
+    }
+  });
+};
+exports.InsertBooster = function(req, res) {
+  let new_boost = new Booster(
+    req.body.booster_name,
+    req.body.booster_dose,
+    req.body.boosterdesc,
+    req.body.booster_date
+  );
+  Booster.insertBooster(new_boost, function(err, booster) {
+    if (err || !booster) {
+      res.json({ error: 'Name already taken ' });
+    } else {
+      res.json(checkAndChange(booster));
+      console.log('-- > Insert in database done ');
+    }
+  });
+};
